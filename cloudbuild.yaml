@@ -1,0 +1,9 @@
+steps:
+  # If a cache exists, fetch it from Cloud Storage
+  - id: "Deploy function"
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: sh
+    args:
+      - "-c"
+      - |
+        cloud functions deploy $_FUNCTION_NAME
