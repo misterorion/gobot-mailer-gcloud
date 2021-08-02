@@ -1,9 +1,15 @@
 steps:
-  # If a cache exists, fetch it from Cloud Storage
-  - id: "Deploy function"
-    name: gcr.io/cloud-builders/gcloud
-    entrypoint: sh
-    args:
-      - "-c"
-      - |
-        gcloud functions deploy $_FUNCTION_NAME
+- id: Print GO version
+  name: golang
+  args: ['go', 'version']
+- id: Deploy function
+  name: gcr.io/cloud-builders/gcloud
+  entrypoint: gcloud
+  args:
+    - functions
+    - deploy
+    - $_FUNCTION_NAME
+    - --trigger-http
+    - --runtime go113
+    - --entry-point Main
+  dir: src
