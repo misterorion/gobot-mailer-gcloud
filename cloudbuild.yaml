@@ -6,4 +6,4 @@ steps:
     args:
       - "-c"
       - |
-        cloud functions deploy $_FUNCTION_NAME
+        gcloud functions deploy $_FUNCTION_NAME
