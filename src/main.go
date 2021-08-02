@@ -1,4 +1,3 @@
-// Package p contains an HTTP Cloud Function.
 package p
 
 import (
