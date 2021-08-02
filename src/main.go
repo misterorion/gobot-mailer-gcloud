@@ -70,8 +70,8 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	// Send the message
 	userIp := r.Header.Get("X-Forwarded-For")
 	m.IP = userIp
-	// err = SendMail(m)
-	err = MockMail(m)
+	err = SendMail(m)
+	// err = MockMail(m)
 
 	if err != nil {
 		logger.Error("Mail sending failed",
