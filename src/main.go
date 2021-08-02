@@ -21,6 +21,9 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	defer logger.Sync()
 
 	if apiKey == "" || domain == "" {
+		logger.Error("Mail sending failed",
+			zap.String("error", "Mailgun credentials missing"),
+		)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -51,7 +54,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate the json
+	// Validate the JSON
 	var m Message
 	err := json.NewDecoder(r.Body).Decode(&m)
 	if err != nil {
