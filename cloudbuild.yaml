@@ -4,7 +4,6 @@ steps:
   args: ['go', 'version']
 - id: Deploy function
   name: gcr.io/cloud-builders/gcloud
-  entrypoint: gcloud
   args:
     - functions
     - deploy
