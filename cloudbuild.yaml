@@ -2,8 +2,8 @@ steps:
 - id: Deploy function
   name: gcr.io/cloud-builders/gcloud
   args:
+    - '--quiet'
     - 'functions'
     - 'deploy'
     - '$_FUNCTION_NAME'
-    - '--quiet'
   dir: 'src'
