@@ -1,14 +1,5 @@
 steps:
-- id: Print GO version
-  name: golang
-  args: ['go', 'version']
 - id: Deploy function
   name: gcr.io/cloud-builders/gcloud
-  args:
-    - 'functions'
-    - 'deploy'
-    - '$_FUNCTION_NAME'
-    - '--trigger-http'
-    - '--runtime go113'
-    - '--entry-point Main'
-  dir: src
+  args: ['functions', 'deploy', '$_FUNCTION_NAME', '--trigger-http', '--runtime go113', '--entry-point Main']
+  dir: 'src'
