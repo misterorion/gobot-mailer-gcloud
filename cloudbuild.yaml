@@ -5,10 +5,10 @@ steps:
 - id: Deploy function
   name: gcr.io/cloud-builders/gcloud
   args:
-    - functions
-    - deploy
-    - $_FUNCTION_NAME
-    - --trigger-http
-    - --runtime go113
-    - --entry-point Main
+    - 'functions'
+    - 'deploy'
+    - '$_FUNCTION_NAME'
+    - '--trigger-http'
+    - '--runtime go113'
+    - '--entry-point Main'
   dir: src
