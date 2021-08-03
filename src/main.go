@@ -11,6 +11,8 @@ import (
 var apiKey string = os.Getenv("MG_API_KEY")
 var domain string = os.Getenv("MG_DOMAIN")
 
+var mock = false
+
 type Message struct {
 	Name, Email, Comment, IP string
 }
@@ -73,8 +75,12 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	// Send the message
 	userIp := r.Header.Get("X-Forwarded-For")
 	m.IP = userIp
-	err = SendMail(m)
-	// err = MockMail(m)
+
+	if mock {
+		err = MockMail(m)
+	} else {
+		err = SendMail(m)
+	}
 
 	if err != nil {
 		logger.Error("Mail sending failed",
