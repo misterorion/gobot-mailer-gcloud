@@ -11,11 +11,26 @@ import (
 var apiKey string = os.Getenv("MG_API_KEY")
 var domain string = os.Getenv("MG_DOMAIN")
 
+var authUser string = os.Getenv("AUTH_USER")
+var authPass string = os.Getenv("AUTH_PASS")
+
 type Message struct {
 	Name, Email, Comment, IP string
 }
 
 func Main(w http.ResponseWriter, r *http.Request) {
+
+	userIp := r.Header.Get("X-Forwarded-For")
+
+	u, p, ok := r.BasicAuth()
+
+	if !ok || u != authUser || p != authPass {
+		log.Warn().
+			Str("IP", userIp).
+			Msg("Unauthorized attempt")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	if apiKey == "" || domain == "" {
 		log.Error().Msg("Missing API key")
@@ -66,7 +81,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the message
-	userIp := r.Header.Get("X-Forwarded-For")
+
 	m.IP = userIp
 	err = SendMail(m)
 	// err = MockMail(m)
