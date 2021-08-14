@@ -27,19 +27,18 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Setup CORS headers
+	// Respond to preflight request
 	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
 	(w).Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
 	(w).Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
 
-	// Respond to preflight request
 	if r.Method == "OPTIONS" {
 		return
 	}
 
+	// Authorize
 	userIp := r.Header.Get("X-Forwarded-For")
 
-	// Authorize
 	u, p, ok := r.BasicAuth()
 
 	if !ok || u != authUser || p != authPass {
@@ -68,7 +67,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate the JSON
+	// Validate the form JSON content
 	var m Message
 	err := json.NewDecoder(r.Body).Decode(&m)
 	if err != nil {
@@ -85,7 +84,6 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the message
-
 	m.IP = userIp
 	err = SendMail(m)
 	// err = MockMail(m)
