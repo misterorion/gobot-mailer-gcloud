@@ -99,7 +99,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	// Send OK status
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
-	w.Write([]byte("OK"))
+	w.Write([]byte("Success"))
 
 	// Log the results
 	log.Info().
