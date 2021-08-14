@@ -20,18 +20,7 @@ type Message struct {
 
 func Main(w http.ResponseWriter, r *http.Request) {
 
-	userIp := r.Header.Get("X-Forwarded-For")
-
-	u, p, ok := r.BasicAuth()
-
-	if !ok || u != authUser || p != authPass {
-		log.Warn().
-			Str("IP", userIp).
-			Msg("Unauthorized attempt")
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
+	// Check if API key present
 	if apiKey == "" || domain == "" {
 		log.Error().Msg("Missing API key")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -42,6 +31,19 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
 	(w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	(w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length")
+
+	userIp := r.Header.Get("X-Forwarded-For")
+
+	// Validate basic auth
+	u, p, ok := r.BasicAuth()
+
+	if !ok || u != authUser || p != authPass {
+		log.Warn().
+			Str("IP", userIp).
+			Msg("Unauthorized attempt")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// Validate the HTTP request
 	if r.Method == "OPTIONS" {
