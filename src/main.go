@@ -32,9 +32,14 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	(w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	(w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length")
 
+	// Respond to preflight request
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	userIp := r.Header.Get("X-Forwarded-For")
 
-	// Validate basic auth
+	// Authorize
 	u, p, ok := r.BasicAuth()
 
 	if !ok || u != authUser || p != authPass {
@@ -46,9 +51,6 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate the HTTP request
-	if r.Method == "OPTIONS" {
-		return
-	}
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
