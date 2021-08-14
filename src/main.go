@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 var apiKey string = os.Getenv("MG_API_KEY")
@@ -17,13 +17,8 @@ type Message struct {
 
 func Main(w http.ResponseWriter, r *http.Request) {
 
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
-
 	if apiKey == "" || domain == "" {
-		logger.Error("Mail sending failed",
-			zap.String("error", "Mailgun credentials missing"),
-		)
+		log.Error().Msg("Missing API key")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -77,9 +72,9 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	// err = MockMail(m)
 
 	if err != nil {
-		logger.Error("Mail sending failed",
-			zap.String("error", err.Error()),
-		)
+		log.Error().
+			Str("Error", err.Error()).
+			Msg("Email sending failed.")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -90,10 +85,10 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 
 	// Log the results
-	logger.Info("Message sent",
-		zap.String("name", m.Name),
-		zap.String("comment", m.Comment),
-		zap.String("email", m.Email),
-		zap.String("ip", m.IP),
-	)
+	log.Info().
+		Str("IP", m.IP).
+		Str("Name", m.Name).
+		Str("Email", m.Email).
+		Str("Comment", m.Comment).
+		Msg("Message sent")
 }
