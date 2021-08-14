@@ -30,7 +30,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	// Setup CORS headers
 	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
 	(w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	(w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length")
+	(w).Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
 
 	// Respond to preflight request
 	if r.Method == "OPTIONS" {
