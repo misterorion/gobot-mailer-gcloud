@@ -14,10 +14,12 @@ var domain string = os.Getenv("MG_DOMAIN")
 var authUser string = os.Getenv("AUTH_USER")
 var authPass string = os.Getenv("AUTH_PASS")
 
+// Message represents an email message
 type Message struct {
 	Name, Email, Comment, IP string
 }
 
+// Main respsonds to HTTP post and sends an email via mailgun
 func Main(w http.ResponseWriter, r *http.Request) {
 
 	// Check if API key present
@@ -27,7 +29,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond to preflight request
+	// Setup CORS
 	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
 	(w).Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
 	(w).Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
@@ -37,13 +39,13 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authorize
-	userIp := r.Header.Get("X-Forwarded-For")
+	userIP := r.Header.Get("X-Forwarded-For")
 
 	u, p, ok := r.BasicAuth()
 
 	if !ok || u != authUser || p != authPass {
 		log.Warn().
-			Str("IP", userIp).
+			Str("IP", userIP).
 			Msg("Unauthorized attempt")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -84,7 +86,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the message
-	m.IP = userIp
+	m.IP = userIP
 	err = SendMail(m)
 	// err = MockMail(m)
 

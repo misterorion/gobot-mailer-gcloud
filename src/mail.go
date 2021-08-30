@@ -9,15 +9,18 @@ import (
 	"github.com/mailgun/mailgun-go/v4"
 )
 
+// MockMail returns a nil error for testing
 func MockMail(m Message) error {
 	return nil
 }
 
+// SendMail sends a message through the Mailgun API
 func SendMail(m Message) error {
 	err := ParseTemplateAndSend(m)
 	return err
 }
 
+// ParseTemplateAndSend sends a mailgun message
 func ParseTemplateAndSend(m Message) error {
 	t, err := template.ParseFiles("serverless_function_source_code/template.html")
 	// t, err := template.ParseFiles("../template.html")
@@ -38,14 +41,14 @@ func ParseTemplateAndSend(m Message) error {
 		return err
 	}
 
-	err = SendComplexMessage(domain, buffer.String(), apiKey)
+	err = sendComplexMessage(domain, buffer.String(), apiKey)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func SendComplexMessage(domain, content string, apiKey string) error {
+func sendComplexMessage(domain, content string, apiKey string) error {
 	mg := mailgun.NewMailgun(domain, apiKey)
 	m := mg.NewMessage(
 		"Form GoBot <form-gobot@mechapower.com>", // From address
