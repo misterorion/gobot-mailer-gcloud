@@ -23,7 +23,7 @@ func SendMail(m Message) error {
 // ParseTemplateAndSend sends a mailgun message
 func ParseTemplateAndSend(m Message) error {
 	t, err := template.ParseFiles("serverless_function_source_code/template.html")
-	// t, err := template.ParseFiles("../template.html")
+	// t, err := template.ParseFiles("../template.html") // For local testing
 
 	if err != nil {
 		return err
