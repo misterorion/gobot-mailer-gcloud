@@ -56,7 +56,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/contact/" {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
 	}
