@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 )
@@ -39,7 +40,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authorize
-	userIP := r.Header.Get("X-Forwarded-For")
+	userIP := strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0]
 
 	u, p, ok := r.BasicAuth()
 
