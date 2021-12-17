@@ -39,9 +39,9 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Authorize
 	userIP := strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0]
 
+	// Authorize
 	u, p, ok := r.BasicAuth()
 
 	if !ok || u != authUser || p != authPass {
