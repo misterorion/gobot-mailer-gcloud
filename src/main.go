@@ -1,27 +1,32 @@
-package p
+package GobotMailer
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"os"
 	"strings"
+	"text/template"
+	"time"
 
+	"github.com/mailgun/mailgun-go/v4"
 	"github.com/rs/zerolog/log"
 )
 
-var apiKey string = os.Getenv("MG_API_KEY")
-var domain string = os.Getenv("MG_DOMAIN")
+var apiKey = os.Getenv("MG_API_KEY")
+var domain = os.Getenv("MG_DOMAIN")
+var authUser = os.Getenv("AUTH_USER")
+var authPass = os.Getenv("AUTH_PASS")
 
-var authUser string = os.Getenv("AUTH_USER")
-var authPass string = os.Getenv("AUTH_PASS")
-
-// Message represents an email message
-type Message struct {
-	Name, Email, Comment, IP string
+type message struct {
+	Name    string
+	Email   string
+	Comment string
+	IP      string
 }
 
-// Main respsonds to HTTP post and sends an email via mailgun
-func Main(w http.ResponseWriter, r *http.Request) {
+func GobotMailer(w http.ResponseWriter, r *http.Request) {
 
 	// Check if API key present
 	if apiKey == "" || domain == "" {
@@ -34,16 +39,15 @@ func Main(w http.ResponseWriter, r *http.Request) {
 	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
 	(w).Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
 	(w).Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
-
 	if r.Method == "OPTIONS" {
 		return
 	}
 
+	// Try to get the user's IP address for logging purposes
 	userIP := strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0]
 
 	// Authorize
 	u, p, ok := r.BasicAuth()
-
 	if !ok || u != authUser || p != authPass {
 		log.Warn().
 			Str("IP", userIP).
@@ -70,8 +74,8 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate the form JSON content
-	var m Message
+	// Decode and Validate data received by the form
+	var m message
 	err := json.NewDecoder(r.Body).Decode(&m)
 	if err != nil {
 		http.Error(w, "Malformed JSON", http.StatusBadRequest)
@@ -88,9 +92,7 @@ func Main(w http.ResponseWriter, r *http.Request) {
 
 	// Send the message
 	m.IP = userIP
-	err = SendMail(m)
-	// err = MockMail(m)
-
+	err = sendMail(m)
 	if err != nil {
 		log.Error().
 			Str("Error", err.Error()).
@@ -99,16 +101,56 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send OK status
+	// Return a success response and log the message
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
-	w.Write([]byte("Success"))
+	_, err = w.Write([]byte("Success"))
 
-	// Log the results
 	log.Info().
 		Str("IP", m.IP).
 		Str("Name", m.Name).
 		Str("Email", m.Email).
 		Str("Comment", m.Comment).
 		Msg("Message sent")
+}
+
+// sendMail sends a message through the Mailgun API using an HTML template
+func sendMail(m message) error {
+	t, err := template.ParseFiles("serverless_function_source_code/template.html")
+	if err != nil {
+		return err
+	}
+
+	var data = map[string]string{
+		"name":    m.Name,
+		"email":   m.Email,
+		"comment": m.Comment,
+		"ip":      m.IP,
+	}
+
+	buffer := new(bytes.Buffer)
+	if err = t.Execute(buffer, data); err != nil {
+		return err
+	}
+
+	mg := mailgun.NewMailgun(domain, apiKey)
+
+	message := mg.NewMessage(
+		"Form GoBot <form-gobot@mechapower.com>", // From address
+		"New form submission",                    // Subject
+		"Enable html to read this message.",      // Plaintext body
+		"orion@mechapower.com",                   // To
+	)
+
+	message.SetHtml(buffer.String())
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	_, _, err = mg.Send(ctx, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
