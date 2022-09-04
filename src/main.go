@@ -14,10 +14,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var apiKey = os.Getenv("MG_API_KEY")
-var domain = os.Getenv("MG_DOMAIN")
-var authUser = os.Getenv("AUTH_USER")
-var authPass = os.Getenv("AUTH_PASS")
+var apiKey = os.Getenv("MG_API_KEY")  // Mailgun API key
+var mgDomain = os.Getenv("MG_DOMAIN") // Mailgun Domain
+var authUser = os.Getenv("AUTH_USER") // Basic Auth user
+var authPass = os.Getenv("AUTH_PASS") // Basic Auth password
 var emailToAddress = os.Getenv("EMAIL_TO")
 var emailFromAddress = os.Getenv("EMAIL_FROM")
 
@@ -31,7 +31,7 @@ type message struct {
 func GobotMailer(w http.ResponseWriter, r *http.Request) {
 
 	// Check if API key present
-	if apiKey == "" || domain == "" {
+	if apiKey == "" || mgDomain == "" {
 		log.Error().Msg("Missing API key")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -135,7 +135,7 @@ func sendMail(m message) error {
 		return err
 	}
 
-	mg := mailgun.NewMailgun(domain, apiKey)
+	mg := mailgun.NewMailgun(mgDomain, apiKey)
 
 	message := mg.NewMessage(
 		emailFromAddress,                    // From address
