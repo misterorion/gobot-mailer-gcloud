@@ -18,6 +18,8 @@ var apiKey = os.Getenv("MG_API_KEY")
 var domain = os.Getenv("MG_DOMAIN")
 var authUser = os.Getenv("AUTH_USER")
 var authPass = os.Getenv("AUTH_PASS")
+var emailToAddress = os.Getenv("EMAIL_TO")
+var emailFromAddress = os.Getenv("EMAIL_FROM")
 
 type message struct {
 	Name    string
@@ -104,7 +106,7 @@ func GobotMailer(w http.ResponseWriter, r *http.Request) {
 	// Return a success response and log the message
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
-	_, err = w.Write([]byte("Success"))
+	_, _ = w.Write([]byte("Success"))
 
 	log.Info().
 		Str("IP", m.IP).
@@ -136,10 +138,10 @@ func sendMail(m message) error {
 	mg := mailgun.NewMailgun(domain, apiKey)
 
 	message := mg.NewMessage(
-		"Form GoBot <form-gobot@mechapower.com>", // From address
-		"New form submission",                    // Subject
-		"Enable html to read this message.",      // Plaintext body
-		"orion@mechapower.com",                   // To
+		emailFromAddress,                    // From address
+		"New form submission",               // Subject
+		"Enable html to read this message.", // Plaintext body
+		emailToAddress,                      // To
 	)
 
 	message.SetHtml(buffer.String())
