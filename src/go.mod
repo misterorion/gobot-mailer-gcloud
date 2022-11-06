@@ -1,6 +1,6 @@
 module github.com/misterorion/gobot-mailer
 
-go 1.18
+go 1.19
 
 require (
 	github.com/mailgun/mailgun-go/v4 v4.8.1
