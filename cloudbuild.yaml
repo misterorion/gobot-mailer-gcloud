@@ -2,9 +2,11 @@ steps:
   - id: Deploy function
     name: gcr.io/cloud-builders/gcloud
     args:
-      - functions
-      - deploy
-      - $_FUNCTION_NAME
-      - --gen2
-      - --region=us-central1
+      [
+        "functions",
+        "deploy",
+        "$_FUNCTION_NAME",
+        "--gen2",
+        "--region=us-central1",
+      ]
     dir: src
