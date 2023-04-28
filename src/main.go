@@ -38,9 +38,9 @@ func GobotMailer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Setup CORS
-	(w).Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
-	(w).Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
-	(w).Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
+	w.Header().Set("Access-Control-Allow-Origin", "https://misterorion.com")
+	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Content-Length")
 	if r.Method == "OPTIONS" {
 		return
 	}
